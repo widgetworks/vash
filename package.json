@@ -22,12 +22,15 @@
     "node": ">= 0.10"
   },
   "scripts": {
-    "prepublish": "npm run test && npm run build",
+    "prepublish": "npm run build",
     "coverage": "cross-env VASHPATH=../../index.js VASHRUNTIMEPATH=../../runtime.js browserify -t envify -t coverify test/vows/vash.test.js | node | coverify",
     "build": "browserify index.js --standalone vash > build/vash.js && browserify --standalone vash runtime.js > build/vash-runtime.js && browserify --standalone vash --external fs --external path lib/helpers/index.js > build/vash-runtime-all.js",
     "test": "cross-env VASHPATH=../../index.js VASHRUNTIMEPATH=../../runtime.js vows test/vows/vash.*.js --spec",
     "docs": "scripts/docs.sh",
     "docs-dev": "scripts/docs-dev.sh"
+  },
+  "disabledscripts": {
+    "prepublish": "npm run test && npm run build"
   },
   "dependencies": {
     "commander": "~1.1.1",
