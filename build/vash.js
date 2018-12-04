@@ -853,7 +853,7 @@ helpers.include = function(name, model){
   this.model = origModel;
 }
 
-helpers.block = function(name, ctn){
+helpers.block = async function(name, ctn){
   this._ensureLayoutProps();
 
   var  self = this
@@ -868,7 +868,7 @@ helpers.block = function(name, ctn){
   // "dependencies" like other includes, blocks, etc
   if( ctn ){
     start = this.buffer.mark();
-    ctn( this.model );
+    await ctn( this.model );
     content = this.buffer.fromMark( start );
 
     // add rendered content to named list of blocks
@@ -3645,7 +3645,7 @@ process.umask = function() { return 0; };
 
 },{}],34:[function(require,module,exports){
 module.exports={
-  "name": "vash",
+  "name": "@wiwo/vash",
   "description": "Razor syntax for JS templating",
   "version": "0.12.6",
   "author": "Andrew Petersen <senofpeter@gmail.com>",
@@ -3669,9 +3669,9 @@ module.exports={
   },
   "scripts": {
     "prepublish": "npm run test && npm run build",
-    "coverage": "VASHPATH=../../index.js VASHRUNTIMEPATH=../../runtime.js browserify -t envify -t coverify test/vows/vash.test.js | node | coverify",
+    "coverage": "cross-env VASHPATH=../../index.js VASHRUNTIMEPATH=../../runtime.js browserify -t envify -t coverify test/vows/vash.test.js | node | coverify",
     "build": "browserify index.js --standalone vash > build/vash.js && browserify --standalone vash runtime.js > build/vash-runtime.js && browserify --standalone vash --external fs --external path lib/helpers/index.js > build/vash-runtime-all.js",
-    "test": "VASHPATH=../../index.js VASHRUNTIMEPATH=../../runtime.js vows test/vows/vash.*.js --spec",
+    "test": "cross-env VASHPATH=../../index.js VASHRUNTIMEPATH=../../runtime.js vows test/vows/vash.*.js --spec",
     "docs": "scripts/docs.sh",
     "docs-dev": "scripts/docs-dev.sh"
   },
@@ -3683,6 +3683,7 @@ module.exports={
   "devDependencies": {
     "browserify": "^13.0.0",
     "coverify": "^1.4.1",
+    "cross-env": "^5.2.0",
     "envify": "^3.4.0",
     "marked": "^0.5.1",
     "vows": "^0.8.1"
@@ -3996,8 +3997,17 @@ runtime['link'] = function( cmpFunc, options ){
       // do not pollute the args array for later attachment to the compiled
       // function for later decompilation/linking
       cmpOpts = options.args.slice();
-      cmpOpts.push(cmpFunc);
-      cmpFunc = Function.apply(null, cmpOpts);
+      
+      if (options.async) {
+        // Wrap the function and invoke to get another one back that is async
+        cmpFunc = Function.apply(null, [`return async function(${cmpOpts.join(', ')}){\n${cmpFunc}\n}`])();
+      } else {
+        cmpOpts.push(cmpFunc);
+        cmpFunc = Function.apply(null, cmpOpts);
+      }
+      
+      
+      
     } catch(e) {
       // TODO: add flag to reportError to know if it's at compile time or runtime
       helpers.reportError(e, 0, 0, originalFunc, /\n/, false);
