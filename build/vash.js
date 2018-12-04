@@ -1685,7 +1685,8 @@ Parser.prototype.continueMarkupAttributeNode = function(node, curr, next) {
     node._expectRight
     && !node.rightIsQuoted
     && (curr.type === tks.DOUBLE_QUOTE
-    || curr.type === tks.SINGLE_QUOTE)
+    || curr.type === tks.SINGLE_QUOTE
+    || curr.type === tks.BACKTICK)
   ) {
     this.flag(node, 'rightIsQuoted', curr.val);
     return true;
@@ -2024,7 +2025,7 @@ Parser.prototype.continueExplicitExpressionNode = function(node, curr, next) {
 
   if (
     !node._waitingForEndQuote
-    && (curr.type === tks.SINGLE_QUOTE || curr.type === tks.DOUBLE_QUOTE)
+    && (curr.type === tks.SINGLE_QUOTE || curr.type === tks.DOUBLE_QUOTE || curr.type === tks.BACKTICK)
   ) {
     this.flag(node, '_waitingForEndQuote', curr.val);
     appendTextValue(valueNode, curr);
@@ -2339,7 +2340,7 @@ Parser.prototype.continueBlockNode = function(node, curr, next, ahead, nnwon) {
 
   if (
     !node._waitingForEndQuote
-    && (curr.type === tks.DOUBLE_QUOTE || curr.type === tks.SINGLE_QUOTE)
+    && (curr.type === tks.DOUBLE_QUOTE || curr.type === tks.SINGLE_QUOTE || curr.type === tks.BACKTICK)
   ) {
     this.flag(node, '_waitingForEndQuote', curr.val);
     appendTextValue(valueNode, curr);
@@ -2407,7 +2408,8 @@ Parser.prototype.continueIndexExpressionNode = function(node, curr, next) {
 
   if (!node._waitingForEndQuote
     && (curr.type === tks.DOUBLE_QUOTE
-    || curr.type === tks.SINGLE_QUOTE)
+    || curr.type === tks.SINGLE_QUOTE
+    || curr.type === tks.BACKTICK)
   ) {
     this.flag(node, '_waitingForEndQuote', curr.val);
     appendTextValue(valueNode, curr);
@@ -2556,6 +2558,7 @@ var TESTS = [
   , 'EXCLAMATION_POINT', (/^(!)/)
   , 'DOUBLE_QUOTE', (/^(\")/)
   , 'SINGLE_QUOTE', (/^(\')/)
+  , 'BACKTICK', (/^(\`)/)
 
   , 'NUMERAL', (/^([0-9])/)
   , 'CONTENT', (/^([^\s])/)
@@ -2568,6 +2571,7 @@ exports.tests = TESTS;
 for(var i = 0; i < TESTS.length; i += 2) {
   exports[TESTS[i]] = TESTS[i];
 }
+
 },{}],26:[function(require,module,exports){
 module.exports = function(obj) {
   // extend works from right to left, using first arg as target
