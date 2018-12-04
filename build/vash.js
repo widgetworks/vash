@@ -3668,12 +3668,15 @@ module.exports={
     "node": ">= 0.10"
   },
   "scripts": {
-    "prepublish": "npm run test && npm run build",
+    "prepublish": "npm run build",
     "coverage": "cross-env VASHPATH=../../index.js VASHRUNTIMEPATH=../../runtime.js browserify -t envify -t coverify test/vows/vash.test.js | node | coverify",
     "build": "browserify index.js --standalone vash > build/vash.js && browserify --standalone vash runtime.js > build/vash-runtime.js && browserify --standalone vash --external fs --external path lib/helpers/index.js > build/vash-runtime-all.js",
     "test": "cross-env VASHPATH=../../index.js VASHRUNTIMEPATH=../../runtime.js vows test/vows/vash.*.js --spec",
     "docs": "scripts/docs.sh",
     "docs-dev": "scripts/docs-dev.sh"
+  },
+  "disabledscripts": {
+    "prepublish": "npm run test && npm run build"
   },
   "dependencies": {
     "commander": "~1.1.1",
@@ -3997,16 +4000,22 @@ runtime['link'] = function( cmpFunc, options ){
       // do not pollute the args array for later attachment to the compiled
       // function for later decompilation/linking
       cmpOpts = options.args.slice();
-      
-      if (options.async) {
+    
+    
+      /**
+       * 2018-12-04 Widget Works
+       * Compile every template to an async function
+       */
+      // if (options.async) {
+        
         // Wrap the function and invoke to get another one back that is async
         cmpFunc = Function.apply(null, [`return async function(${cmpOpts.join(', ')}){\n${cmpFunc}\n}`])();
-      } else {
-        cmpOpts.push(cmpFunc);
-        cmpFunc = Function.apply(null, cmpOpts);
-      }
-      
-      
+        
+      // } else {
+      //   cmpOpts.push(cmpFunc);
+      //   cmpFunc = Function.apply(null, cmpOpts);
+      // }
+        
       
     } catch(e) {
       // TODO: add flag to reportError to know if it's at compile time or runtime
