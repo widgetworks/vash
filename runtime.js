@@ -304,16 +304,22 @@ runtime['link'] = function( cmpFunc, options ){
       // do not pollute the args array for later attachment to the compiled
       // function for later decompilation/linking
       cmpOpts = options.args.slice();
-      
-      if (options.async) {
+    
+    
+      /**
+       * 2018-12-04 Widget Works
+       * Compile every template to an async function
+       */
+      // if (options.async) {
+        
         // Wrap the function and invoke to get another one back that is async
         cmpFunc = Function.apply(null, [`return async function(${cmpOpts.join(', ')}){\n${cmpFunc}\n}`])();
-      } else {
-        cmpOpts.push(cmpFunc);
-        cmpFunc = Function.apply(null, cmpOpts);
-      }
-      
-      
+        
+      // } else {
+      //   cmpOpts.push(cmpFunc);
+      //   cmpFunc = Function.apply(null, cmpOpts);
+      // }
+        
       
     } catch(e) {
       // TODO: add flag to reportError to know if it's at compile time or runtime
