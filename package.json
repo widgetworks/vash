@@ -1,5 +1,5 @@
 {
-  "name": "vash",
+  "name": "@wiwo/vash",
   "description": "Razor syntax for JS templating",
   "version": "0.12.6",
   "author": "Andrew Petersen <senofpeter@gmail.com>",
