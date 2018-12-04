@@ -304,8 +304,17 @@ runtime['link'] = function( cmpFunc, options ){
       // do not pollute the args array for later attachment to the compiled
       // function for later decompilation/linking
       cmpOpts = options.args.slice();
-      cmpOpts.push(cmpFunc);
-      cmpFunc = Function.apply(null, cmpOpts);
+      
+      if (options.async) {
+        // Wrap the function and invoke to get another one back that is async
+        cmpFunc = Function.apply(null, [`return async function(${cmpOpts.join(', ')}){\n${cmpFunc}\n}`])();
+      } else {
+        cmpOpts.push(cmpFunc);
+        cmpFunc = Function.apply(null, cmpOpts);
+      }
+      
+      
+      
     } catch(e) {
       // TODO: add flag to reportError to know if it's at compile time or runtime
       helpers.reportError(e, 0, 0, originalFunc, /\n/, false);
