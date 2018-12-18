@@ -1,7 +1,7 @@
 {
   "name": "@wiwo/vash",
   "description": "Razor syntax for JS templating",
-  "version": "0.12.6",
+  "version": "0.12.6-wiwo.1",
   "author": "Andrew Petersen <senofpeter@gmail.com>",
   "homepage": "https://github.com/kirbysayshi/vash",
   "bin": {
